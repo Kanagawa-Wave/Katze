@@ -8,3 +8,5 @@ Binaries
 Intermediates
 
 Engine/Logs
+
+*.sln

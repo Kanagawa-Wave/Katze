@@ -87,119 +87,139 @@ project "Glad"
         runtime "Release"
         optimize "on"
 
-project "GLFW"
-    location "Projects"
-    kind "StaticLib"
-    language "C"
-    staticruntime "on"
-    
-    targetdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
-    objdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
-    
-    files
-    {
-        "Engine/Vendor/glfw/include/GLFW/glfw3.h",
-        "Engine/Vendor/glfw/include/GLFW/glfw3native.h",
-        "Engine/Vendor/glfw/src/glfw_config.h",
-        "Engine/Vendor/glfw/src/context.c",
-        "Engine/Vendor/glfw/src/init.c",
-        "Engine/Vendor/glfw/src/input.c",
-        "Engine/Vendor/glfw/src/monitor.c",
-        "Engine/Vendor/glfw/src/vulkan.c",
-        "Engine/Vendor/glfw/src/window.c"
-    }
+include "Engine/Vendor/imgui"
+include "Engine/Vendor/glfw"
 
-    filter "system:linux"
-        pic "On"
-        systemversion "latest"
-    
-        files
-        {
-            "Engine/Vendor/glfw/src/x11_init.c",
-            "Engine/Vendor/glfw/src/x11_monitor.c",
-            "Engine/Vendor/glfw/src/x11_window.c",
-            "Engine/Vendor/glfw/src/xkb_unicode.c",
-            "Engine/Vendor/glfw/src/posix_time.c",
-            "Engine/Vendor/glfw/src/posix_thread.c",
-            "Engine/Vendor/glfw/src/glx_context.c",
-            "Engine/Vendor/glfw/src/egl_context.c",
-            "Engine/Vendor/glfw/src/osmesa_context.c",
-            "Engine/Vendor/glfw/src/linux_joystick.c"
-        }
-    
-        defines
-        {
-            "_GLFW_X11"
-        }
-    
-    filter "system:windows"
-        systemversion "latest"
-    
-        files
-        {
-            "Engine/Vendor/glfw/src/win32_init.c",
-            "Engine/Vendor/glfw/src/win32_joystick.c",
-            "Engine/Vendor/glfw/src/win32_monitor.c",
-            "Engine/Vendor/glfw/src/win32_time.c",
-            "Engine/Vendor/glfw/src/win32_thread.c",
-            "Engine/Vendor/glfw/src/win32_window.c",
-            "Engine/Vendor/glfw/src/wgl_context.c",
-            "Engine/Vendor/glfw/src/egl_context.c",
-            "Engine/Vendor/glfw/src/osmesa_context.c"
-        }
-        
-        defines
-        {
-            "_GLFW_WIN32",
-            "_CRT_SECURE_NO_WARNINGS"
-        }
-    
-    filter "configurations:Debug"
-        runtime "Debug"
-        symbols "on"
-    
-    filter "configurations:Release"
-        runtime "Release"
-        optimize "on"
-
-project "ImGui"
-    location "Projects"
-    kind "StaticLib"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "On"
-    
-    targetdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
-    objdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
-    
-    files
-    {
-        "Engine/Vendor/imgui/imconfig.h",
-        "Engine/Vendor/imgui/imgui.h",
-        "Engine/Vendor/imgui/imgui.cpp",
-        "Engine/Vendor/imgui/imgui_draw.cpp",
-        "Engine/Vendor/imgui/imgui_internal.h",
-        "Engine/Vendor/imgui/imgui_widgets.cpp",
-        "Engine/Vendor/imgui/imstb_rectpack.h",
-        "Engine/Vendor/imgui/imstb_textedit.h",
-        "Engine/Vendor/imgui/imstb_truetype.h",
-        "Engine/Vendor/imgui/imgui_demo.cpp"
-    }
-    
-    filter "system:windows"
-        systemversion "latest"
-    
-    filter "system:linux"
-        pic "On"
-        systemversion "latest"
-    
-    filter "configurations:Debug"
-        runtime "Debug"
-        symbols "on"
-    
-    filter "configurations:Release"
-        runtime "Release"
-        optimize "on"
+--project "GLFW"
+--    location "Projects"
+--    kind "StaticLib"
+--    language "C"
+--    staticruntime "off"
+--    
+--    targetdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
+--    objdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
+--    
+--    files
+--    {
+--        "Engine/Vendor/glfw/include/GLFW/glfw3.h",
+--        "Engine/Vendor/glfw/include/GLFW/glfw3native.h",
+--        
+--        "Engine/Vendor/glfw/src/glfw_config.h",
+--        "Engine/Vendor/glfw/src/context.c",
+--        "Engine/Vendor/glfw/src/init.c",
+--        "Engine/Vendor/glfw/src/input.c",
+--        "Engine/Vendor/glfw/src/monitor.c",
+--
+--        "Engine/Vendor/glfw/src/null_init.c",
+--        "Engine/Vendor/glfw/src/null_joystick.c",
+--        "Engine/Vendor/glfw/src/null_monitor.c",
+--        "Engine/Vendor/glfw/src/null_window.c",
+--        
+--        "Engine/Vendor/glfw/src/platform.c",
+--        "Engine/Vendor/glfw/src/vulkan.c",
+--        "Engine/Vendor/glfw/src/window.c"
+--    }
+--
+--    filter "system:linux"
+--        pic "On"
+--        systemversion "latest"
+--    
+--        files
+--        {
+--            "Engine/Vendor/glfw/src/x11_init.c",
+--            "Engine/Vendor/glfw/src/x11_monitor.c",
+--            "Engine/Vendor/glfw/src/x11_window.c",
+--            "Engine/Vendor/glfw/src/xkb_unicode.c",
+--            "Engine/Vendor/glfw/src/posix_time.c",
+--            "Engine/Vendor/glfw/src/posix_thread.c",
+--            "Engine/Vendor/glfw/src/glx_context.c",
+--            "Engine/Vendor/glfw/src/egl_context.c",
+--            "Engine/Vendor/glfw/src/osmesa_context.c",
+--            "Engine/Vendor/glfw/src/linux_joystick.c"
+--        }
+--    
+--        defines
+--        {
+--            "_GLFW_X11"
+--        }
+--    
+--    filter "system:windows"
+--        systemversion "latest"
+--    
+--        files
+--        {
+--            "Engine/Vendor/glfw/src/win32_init.c",
+--            "Engine/Vendor/glfw/src/win32_joystick.c",
+--            "Engine/Vendor/glfw/src/win32_monitor.c",
+--            "Engine/Vendor/glfw/src/win32_time.c",
+--            "Engine/Vendor/glfw/src/win32_thread.c",
+--            "Engine/Vendor/glfw/src/win32_window.c",
+--            "Engine/Vendor/glfw/src/wgl_context.c",
+--            "Engine/Vendor/glfw/src/egl_context.c",
+--            "Engine/Vendor/glfw/src/osmesa_context.c"
+--        }
+--        
+--        defines
+--        {
+--            "_GLFW_WIN32",
+--            "_CRT_SECURE_NO_WARNINGS"
+--        }
+--
+--        links
+--        {
+--            "Dwmapi.lib"
+--        }
+--        
+--    filter "configurations:Debug"
+--        runtime "Debug"
+--        symbols "on"
+--        
+--    filter "configurations:Release"
+--        runtime "Release"
+--        optimize "on"
+--        
+--    filter "configurations:Dist"
+--        runtime "Release"
+--        optimize "on"
+--        symbols "off"
+--
+--project "ImGui"
+--    location "Projects"
+--    kind "StaticLib"
+--    language "C++"
+--    cppdialect "C++17"
+--    
+--    targetdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
+--    objdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
+--    
+--    files
+--    {
+--        "Engine/Vendor/imgui/imconfig.h",
+--        "Engine/Vendor/imgui/imgui.h",
+--        "Engine/Vendor/imgui/imgui.cpp",
+--        "Engine/Vendor/imgui/imgui_draw.cpp",
+--        "Engine/Vendor/imgui/imgui_internal.h",
+--        "Engine/Vendor/imgui/imgui_widgets.cpp",
+--        "Engine/Vendor/imgui/imstb_rectpack.h",
+--        "Engine/Vendor/imgui/imstb_textedit.h",
+--        "Engine/Vendor/imgui/imstb_truetype.h",
+--        "Engine/Vendor/imgui/imgui_demo.cpp"
+--    }
+--    
+--    filter "system:windows"
+--        systemversion "latest"
+--    
+--    filter "system:linux"
+--        pic "On"
+--        systemversion "latest"
+--    
+--    filter "configurations:Debug"
+--        runtime "Debug"
+--        symbols "on"
+--    
+--    filter "configurations:Release"
+--        runtime "Release"
+--        optimize "on"
 
 project "Engine"
     location "Projects"
@@ -254,15 +274,16 @@ project "Engine"
     
     links
     {
+        "%{Libraries.OpenGL}",
         "GLFW",
         "Glad",
         "ImGui",
-        "%{Libraries.OpenGL}",
+        "Shcore.lib"
     }
     
     ignoredefaultlibraries
     {
-        "MSVCRT",
+        "LIBCMTD",
     }
 
     rules { "CompileShaders" }
@@ -272,8 +293,7 @@ project "Engine"
 
         postbuildcommands
         {
-            "{ECHO} Copying Assets folder...",
-            "{COPYDIR} Engine/Assets %{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}"
+            "{COPYDIR} %{wks.location}Engine/Assets %{wks.location}Binaries/" .. outputdir .. "/%{prj.name}/Assets"
         }
         
         defines

@@ -2,7 +2,6 @@
 
 -- VULKAN_SDK = os.getenv("VULKAN_SDK")
 
-
 rule "CompileShaders"
     location "Rules"
     display "GLSL Shader Compiler"
@@ -47,6 +46,7 @@ IncludeDir["SPDLOG"] = "Engine/Vendor/spdlog/include"
 IncludeDir["IMGUI"] = "Engine/Vendor/imgui"
 IncludeDir["STB_IMAGE"] = "Engine/Vendor/stb"
 IncludeDir["TINYOBJLOADER"] = "Engine/Vendor/tinyobjloader"
+IncludeDir["ENTT"] = "Engine/Vendor/entt"
 
 LibraryDir = {}
 -- LibraryDir["VulkanSDK"] = "%{VULKAN_SDK}/Lib"
@@ -237,6 +237,7 @@ project "Engine"
         "%{IncludeDir.IMGUI}",
         "%{IncludeDir.STB_IMAGE}",
         "%{IncludeDir.TINYOBJLOADER}",
+        "%{IncludeDir.ENTT}"
         -- "%{IncludeDir.VulkanSDK}",
     }
     

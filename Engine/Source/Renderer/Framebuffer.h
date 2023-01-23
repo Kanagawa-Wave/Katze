@@ -6,7 +6,7 @@ typedef unsigned GLuint;
 class Framebuffer
 {
 public:
-    Framebuffer(uint32_t width, uint32_t height);
+    Framebuffer(uint32_t width = 1280, uint32_t height = 720);
     ~Framebuffer();
     unsigned int GetTexture() const { return m_texture->GetTexture(); }
     void ResizeFrameBuffer(uint32_t width, uint32_t height) const;

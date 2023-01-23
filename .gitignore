@@ -1,7 +1,6 @@
 .vs
 .idea
 
-Projects
 Rules
 
 Binaries
@@ -10,3 +9,6 @@ Intermediates
 Engine/Logs
 
 *.sln
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters

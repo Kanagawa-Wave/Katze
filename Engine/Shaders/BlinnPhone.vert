@@ -11,8 +11,6 @@ layout (location = 2) out vec3 outPosWorld;
 layout (location = 3) out vec3 outNormalWorld;
 
 layout (location = 0) uniform mat4 model;
-//layout (location = 1) uniform mat4 view;
-//layout (location = 2) uniform mat4 projection;
 layout (location = 1) uniform mat4 normal;
 
 layout (set = 0, binding = 0) uniform GlobalUbo 

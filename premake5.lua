@@ -25,14 +25,16 @@ workspace "Katze"
         "Release",
         "Dist",
     }
-    
+
     flags
     {
         --"OmitDefaultLibrary",
         "MultiProcessorCompile"
     }
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+    outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+    
+    debugdir ("Binaries/" .. outputdir .. "/Engine")
 
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}

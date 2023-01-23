@@ -13,8 +13,8 @@
 #include "imgui.h"
 #include "Renderer/Framebuffer.h"
 #include "Renderer/Renderer.h"
-#include "UI/imgui_impl_glfw.h"
-#include "UI/imgui_impl_opengl3.h"
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 
 Editor::Editor()
 {

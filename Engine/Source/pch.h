@@ -16,9 +16,8 @@
 #include <unordered_set>
 #include <array>
 
-#include "Logger/Log.h"
+#include "Log/Log.h"
 #include "Event/Event.h"
-
 
 #ifdef _PLATFORM_WINDOWS
     #include "Windows.h"

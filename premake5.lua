@@ -17,7 +17,7 @@ rule "CompileShaders"
 
 workspace "Katze"
     architecture "x64"
-    startproject "Engine"
+    startproject "Editor"
     
     configurations
     {
@@ -28,13 +28,12 @@ workspace "Katze"
 
     flags
     {
-        --"OmitDefaultLibrary",
         "MultiProcessorCompile"
     }
 
     outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
     
-    debugdir ("Binaries/" .. outputdir .. "/Engine")
+    debugdir ("Binaries/" .. outputdir .. "/Editor")
 
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
@@ -57,40 +56,100 @@ LibraryDir = {}
 Libraries = {}
 Libraries["OpenGL"] = "opengl32.lib"
 
-project "Glad"
+project "Editor"
     location "Projects"
-    kind "StaticLib"
-    language "C"
-    staticruntime "On"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
+    staticruntime "off"
 
     targetdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/Intermediates/" .. outputdir .. "/%{prj.name}")
 
     files
     {
-        "Engine/Vendor/glad/include/glad/glad.h",
-        "Engine/Vendor/glad/include/KHR/khrplatform.h",
-        "Engine/Vendor/glad/src/glad.c"
+        "Editor/Source/**.h",
+        "Editor/Source/**.cpp"
     }
     
     includedirs
     {
-        "Engine/Vendor/glad/include"
+        "%{wks.location}/Engine/Vendor/spdlog/include",
+        "%{wks.location}/Engine/Source",
+        "%{wks.location}/Engine/Vendor",
+        "%{IncludeDir.ENTT}",
+        "%{IncludeDir.GLM}",
+    }
+    
+    links
+    {
+        "Engine"
+    }
+
+    ignoredefaultlibraries
+    {
+        "LIBCMTD",
     }
     
     filter "system:windows"
         systemversion "latest"
+        postbuildcommands
+        {
+            "{COPYDIR} %{wks.location}Engine/Assets %{wks.location}Binaries/" .. outputdir .. "/%{prj.name}/Assets",
+            "{COPYDIR} %{wks.location}Binaries/" .. outputdir .. "/Engine/Shaders %{wks.location}Binaries/" .. outputdir .. "/%{prj.name}/Shaders"
+        }
     
     filter "configurations:Debug"
+        defines "_DEBUG"
         runtime "Debug"
         symbols "on"
     
     filter "configurations:Release"
+        defines "_RELEASE"
+        runtime "Release"
+        optimize "on"
+    
+    filter "configurations:Dist"
+        defines "_DIST"
         runtime "Release"
         optimize "on"
 
-include "Engine/Vendor/imgui"
-include "Engine/Vendor/glfw"
+group "Dependencies"
+    project "Glad"
+        location "Projects"
+        kind "StaticLib"
+        language "C"
+        staticruntime "On"
+    
+        targetdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
+        objdir ("%{wks.location}/Intermediates/" .. outputdir .. "/%{prj.name}")
+    
+        files
+        {
+            "Engine/Vendor/glad/include/glad/glad.h",
+            "Engine/Vendor/glad/include/KHR/khrplatform.h",
+            "Engine/Vendor/glad/src/glad.c"
+        }
+        
+        includedirs
+        {
+            "Engine/Vendor/glad/include"
+        }
+        
+        filter "system:windows"
+            systemversion "latest"
+        
+        filter "configurations:Debug"
+            runtime "Debug"
+            symbols "on"
+        
+        filter "configurations:Release"
+            runtime "Release"
+            optimize "on"
+    
+    include "Engine/Vendor/imgui"
+    include "Engine/Vendor/glfw"
+group ""
 
 --project "GLFW"
 --    location "Projects"
@@ -225,10 +284,10 @@ include "Engine/Vendor/glfw"
 
 project "Engine"
     location "Projects"
-    kind "ConsoleApp"
-    staticruntime "Off"
+    kind "StaticLib"
+    staticruntime "off"
     language "C++"
-    cppdialect "C++20"
+    cppdialect "C++17"
     
     targetdir ("%{wks.location}/Binaries/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/Intermediates/" .. outputdir .. "/%{prj.name}")
@@ -287,16 +346,10 @@ project "Engine"
     {
         "LIBCMTD",
     }
-
-    rules { "CompileShaders" }
     
     filter "system:windows"
+        rules { "CompileShaders" }
         systemversion "latest"
-
-        postbuildcommands
-        {
-            "{COPYDIR} %{wks.location}Engine/Assets %{wks.location}Binaries/" .. outputdir .. "/%{prj.name}/Assets"
-        }
         
         defines
         {

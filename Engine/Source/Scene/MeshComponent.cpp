@@ -10,6 +10,7 @@
 #include "Core/Core.h"
 #include "glad/glad.h"
 #include "Renderer/Renderer.h"
+#include "Timer.h"
 
 template <typename T, typename... Rest>
 void hashCombine(std::size_t& seed, const T& v, const Rest&... rest)
@@ -106,7 +107,7 @@ void MeshComponent::LoadMeshFromFile(const std::string& path)
             }
 
 
-            if (!uniqueVertices.contains(vertex))
+            if (uniqueVertices.count(vertex) == 0)
             {
                 uniqueVertices[vertex] = static_cast<uint32_t>(m_vertices.size());
                 m_vertices.push_back(vertex);

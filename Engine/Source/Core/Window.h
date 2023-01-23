@@ -24,7 +24,7 @@ public:
     inline unsigned int GetWidth() const { return m_data.Width; }
     inline unsigned int GetHeight() const { return m_data.Height; }
 
-    inline void SetEventCallback(const EventCallbackFn& callback)
+    void SetEventCallback(const EventCallbackFn& callback)
     {
         m_data.EventCallback = callback;
     }

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Logger/Log.h"
+#include "Log/Log.h"
 
 enum class ShaderDataType : uint8_t
 {

@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "Editor.h"
 #include "Window.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Buffers.h"
@@ -11,10 +10,12 @@
 
 #include "Event/Event.h"
 #include "Event/ApplicationEvent.h"
+#include "Layer/LayerStack.h"
 #include "Renderer/Framebuffer.h"
 #include "Scene/Camera.h"
 #include "Scene/GameObject.h"
 #include "Scene/MeshComponent.h"
+#include "UI/ImGuiLayer.h"
 
 /*! @brief Application class maintains the OpenGL context and currently owns a GLFW window.
  *
@@ -24,32 +25,34 @@
 class Application
 {
 public:
-    Application(const Application& app) = delete;
+    Application();
     ~Application();
-
-    static Application* GetInstance();
-    const Window* GetWindow() const { return m_editor->GetWindow(); } 
+    
+    Application(const Application& app) = delete;
+    Application& operator=(const Application&) = delete;
+    
+    inline Window* GetWindow() { return m_Window; }
+    static inline Application* Get() { return s_Application; }
     
     void Run();
     void OnEvent(Event& e);
 
-    void Init();
-    void LoadDemo();
-
+    void PushLayer(Layer* layer);
+    void PushOverlay(Layer* layer);
 private:
-    void Update(float dt);
-    void Render();
-    
-    Application() = default;
     bool OnWindowClose(WindowCloseEvent& e);
     bool OnWindowResize(WindowResizeEvent& e);
+
+    LayerStack m_LayerStack;
     
-    static Application* s_pApplication;
+    Window* m_Window = nullptr;
+    WindowProps m_Props = WindowProps("Katze", 1920, 1080);
 
-    Editor* m_editor = nullptr;
+    ImGuiLayer* m_ImGuiLayer = nullptr;
+    static Application* s_Application;
 
-    Scene m_scene;
-
-    bool m_isRunning = true;
-    bool m_isMinimized = false;
+    bool m_Running = true;
+    bool m_Minimized = false;
 };
+
+Application* CreateApplication();

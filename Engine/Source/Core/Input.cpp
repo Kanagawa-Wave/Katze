@@ -17,14 +17,14 @@ void Input::Init(HWND hwnd)
 
 bool Input::IsKeyPressed(int keycode)
 {
-    GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetInstance()->GetWindow()->GetNativeWindow());
+    GLFWwindow* window = Application::Get()->GetWindow()->GetGLFWWindow();
     const int state = glfwGetKey(window, keycode);
     return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
 bool Input::IsMouseButtonPressed(int button)
 {
-    GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetInstance()->GetWindow()->GetNativeWindow());
+    GLFWwindow* window = Application::Get()->GetWindow()->GetGLFWWindow();
     const int state = glfwGetMouseButton(window, button);
     return state == GLFW_PRESS;
 }
@@ -41,7 +41,7 @@ float Input::GetMouseY()
 
 glm::vec2 Input::GetMousePosition()
 {
-    GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetInstance()->GetWindow()->GetNativeWindow());
+    GLFWwindow* window = Application::Get()->GetWindow()->GetGLFWWindow();
     double x, y;
     glfwGetCursorPos(window, &x, &y);
     return {x, y};
@@ -49,6 +49,6 @@ glm::vec2 Input::GetMousePosition()
 
 void Input::SetCursorMode(CursorMode mode)
 {
-    GLFWwindow* window = static_cast<GLFWwindow*>(Application::GetInstance()->GetWindow()->GetNativeWindow());
+    GLFWwindow* window = Application::Get()->GetWindow()->GetGLFWWindow();
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)mode);
 }

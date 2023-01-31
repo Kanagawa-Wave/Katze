@@ -38,34 +38,15 @@ private:
     uint32_t m_ibo = 0, m_count = 0;
 };
 
-struct GlobalUbo
-{
-    glm::mat4 projection;
-    glm::mat4 view;
-    glm::vec4 ambientColor;
-    glm::vec3 lightPosition;
-    alignas(16) glm::vec4 lightColor; // w is lightIntensity
-};
-
 class UniformBuffer
 {
 public:
-    UniformBuffer() = default;
+    UniformBuffer(uint32_t size, uint32_t binding);
     ~UniformBuffer();
 
-    void Init();
-    
-    void Bind() const;
-    void UnBind() const;
-    
-    uint32_t GetID() const;
-    uint32_t GetIndex() const;
-
-    void SetData(const GlobalUbo& data);
-    GlobalUbo& GetData();
+    void SetData(const void* data, uint32_t size, uint32_t offset = 0) const;
 private:
-    uint32_t m_ubo = 0, m_index = 0;
-    GlobalUbo m_data;
+    uint32_t m_ubo = 0;
 };
 
 

@@ -83,7 +83,8 @@ project "Editor"
     
     links
     {
-        "Engine"
+        "Shcore.lib",
+        "Engine",
     }
 
     ignoredefaultlibraries
@@ -335,11 +336,11 @@ project "Engine"
     
     links
     {
+        --"Shcore.lib",
         "%{Libraries.OpenGL}",
         "GLFW",
         "Glad",
         "ImGui",
-        "Shcore.lib"
     }
     
     ignoredefaultlibraries

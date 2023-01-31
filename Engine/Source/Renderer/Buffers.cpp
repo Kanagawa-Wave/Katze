@@ -70,49 +70,19 @@ uint32_t IndexBuffer::GetID() const
     return m_ibo;
 }
 
+UniformBuffer::UniformBuffer(uint32_t size, uint32_t binding)
+{
+    glCreateBuffers(1, &m_ubo);
+    glNamedBufferData(m_ubo, size, nullptr, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_ubo);
+}
+
+void UniformBuffer::SetData(const void* data, uint32_t size, uint32_t offset) const
+{
+    glNamedBufferSubData(m_ubo, offset, size, data);
+}
+
 UniformBuffer::~UniformBuffer()
 {
     glDeleteBuffers(1, &m_ubo);
-}
-
-void UniformBuffer::Init()
-{
-    glGenBuffers(1, &m_ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_ubo);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(GlobalUbo), nullptr, GL_STATIC_DRAW);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-
-void UniformBuffer::Bind() const
-{
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_ubo);
-}
-
-void UniformBuffer::UnBind() const
-{
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-
-uint32_t UniformBuffer::GetID() const
-{
-    return m_ubo;
-}
-
-
-uint32_t UniformBuffer::GetIndex() const
-{
-    return m_index;
-}
-
-
-void UniformBuffer::SetData(const GlobalUbo& data)
-{
-    m_data = data;
-}
-
-
-GlobalUbo& UniformBuffer::GetData()
-{
-    return m_data;
 }

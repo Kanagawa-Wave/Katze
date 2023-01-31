@@ -1,24 +1,50 @@
 ﻿#pragma once
 
-#include "GameObject.h"
+#include "Camera.h"
 
-struct Scene
+#include <entt.hpp>
+
+class Entity;
+
+class Scene
 {
-    Camera* camera;
-    GameObject::Map Objects;
-    UniformBuffer ubo;
-    GlobalUbo uboData;
-    float DeltaTime;
+public:
+    using Map = std::unordered_map<uint32_t, entt::entity>;
+    
+    Scene();
+    ~Scene();
+    
+    Entity CreateEntity(const std::string& name = std::string());
+    Entity CreateStaticMesh(const std::string& name = std::string(), const std::string& meshPath = std::string(), const std::string& texturePath = "Assets/white.png");
+    Entity CreateEntityWithUUID(uint32_t uuid, const std::string& name = std::string());
+    void DestroyEntity(Entity entity);
 
-    inline void SetData() { ubo.SetData(uboData); }
-    inline void Init()
+    Entity FindEntityByName(std::string_view name);
+    Entity GetEntityByUUID(uint32_t uuid);
+
+    bool IsRunning() const { return m_IsRunning; }
+    bool IsPaused() const { return m_IsPaused; }
+
+    void SetPaused(bool paused) { m_IsPaused = paused; }
+
+    void Step(int frames = 1);
+
+    template<typename... Components>
+    auto GetAllEntitiesWith()
     {
-        camera = new Camera(45.0f, 0.1f, 1000000.0f);
-        ubo.Init();
+        return m_Registry.view<Components...>();
     }
-    inline void OnUpdate(float dt)
-    {
-        DeltaTime = dt;
-        camera->OnUpdate(dt);
-    }
+    void RenderScene(const Camera& camera);
+private:
+
+private:
+    entt::registry m_Registry;
+    uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+    bool m_IsRunning = false;
+    bool m_IsPaused = false;
+    int m_StepFrames = 0;
+
+    Map m_EntityMap;
+
+    friend class Entity;
 };

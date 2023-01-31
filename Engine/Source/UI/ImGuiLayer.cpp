@@ -6,7 +6,6 @@
 #include <backends/imgui_impl_opengl3.h>
 
 #include <GLFW/glfw3.h>
-//#include <glad/glad.h>
 
 #include "Application.h"
 
@@ -29,10 +28,11 @@ void ImGuiLayer::OnAttach()
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
-
-    float fontSize = 18.0f;// *2.0f;
+    
+    const float DPI_MULTIPLIER = (float)GetDpiForSystem() / 96.f;
+    float fontSize = 18.0f * DPI_MULTIPLIER;// *2.0f;
     io.Fonts->AddFontFromFileTTF("Assets/OpenSans-Regular.ttf", fontSize);
-    io.FontDefault = io.Fonts->AddFontFromFileTTF("Assets/OpenSans-Light.ttf", fontSize);
+    io.FontDefault = io.Fonts->AddFontFromFileTTF("Assets/OpenSans-Regular.ttf", fontSize);
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();

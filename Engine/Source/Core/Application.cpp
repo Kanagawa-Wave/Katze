@@ -3,8 +3,9 @@
 #include "Application.h"
 
 #include "Timer.h"
+#include "Renderer/Renderer.h"
 
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+#define APP_BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
 Application* Application::s_Application = nullptr;
 
@@ -16,8 +17,10 @@ Application::Application()
     
     m_Window = new Window(m_Props);
 
+    Renderer::Init();
+    
     m_ImGuiLayer = new ImGuiLayer();
-    m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+    m_Window->SetEventCallback(APP_BIND_EVENT_FN(OnEvent));
     m_Window->SetVSync(false);
     PushOverlay(m_ImGuiLayer);
 }
@@ -94,3 +97,5 @@ bool Application::OnWindowResize(WindowResizeEvent& e)
 
     return true;
 }
+
+#undef APP_BIND_EVENT_FN

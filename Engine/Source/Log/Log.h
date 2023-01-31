@@ -45,3 +45,12 @@ private:
 #define CLIENT_WARN(...) ::Log::GetClientLogger()->warn(__VA_ARGS__);
 #define CLIENT_INFO(...) ::Log::GetClientLogger()->info(__VA_ARGS__);
 #define CLIENT_TRACE(...) ::Log::GetClientLogger()->trace(__VA_ARGS__);
+
+#ifdef _DEBUG
+#define CLIENT_ASSERT(x, ...) { if(!(x)) { CLIENT_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#define CORE_ASSERT(x, ...) { if(!(x)) { LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#else
+#define CLIENT_ASSERT(x, ...)
+#define CORE_ASSERT(x, ...)
+#endif
+#define KT_THROW_EXCEPTION(...) { throw std::runtime_error(__VA_ARGS__);}

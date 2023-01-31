@@ -23,8 +23,7 @@ public:
     void UploadUniformFloat3(const std::string& name, const glm::vec3& values) const;
     void UploadUniformFloat2(const std::string& name, const glm::vec2& values) const;
     void UploadUniformFloat(const std::string& name, const float& value) const;
-    
-    void UploadUniformBuffer(const std::string& name, UniformBuffer& ubo) const;
+
 private:
     std::unordered_map<GLenum, std::vector<char>> ReadFile(const std::string& path);
     void CreateShader(const std::unordered_map<GLenum, std::vector<char>>& input);

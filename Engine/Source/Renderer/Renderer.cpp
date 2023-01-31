@@ -2,14 +2,17 @@
 
 #include "Renderer.h"
 
-#include <ranges>
 #include <glad/glad.h>
 
-#include "Core/Application.h"
-#include "Core/Application.h"
+static Renderer::RenderData s_Data;
 
 void Renderer::Init()
 {
+    s_Data.UniformBuffer = new UniformBuffer(sizeof(RenderData::GlobalUbo), 0);
+    s_Data.UniformData = RenderData::GlobalUbo();
+    s_Data.UniformData.lightColor = {1.f, 1.f, 1.f, 1.f};
+    s_Data.UniformData.ambientColor = {0.f, 0.f, 0.f, 1.f};
+    
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glEnable(GL_CULL_FACE);
@@ -31,32 +34,90 @@ void Renderer::ResizeViewport(unsigned width, unsigned height)
     glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 }
 
-void Renderer::Submit(Scene& scene)
+void Renderer::Begin(const Camera& camera)
 {
-    for (const auto& [id, object] : scene.Objects)
-    {
-        object.GetMesh().GetShader()->Bind();
-        object.GetMesh().GetVertexArray()->Bind();
-        object.GetMesh().GetTexture()->Bind();
+    s_Data.UniformData.projection = camera.GetProjection();
+    s_Data.UniformData.view = camera.GetView();
 
-        glm::mat4 model, view, projection, normal;
-        model = object.GetTransform().GetModelMat();
-        view = scene.camera->GetView();
-        projection = scene.camera->GetProjection();
-        normal = object.GetTransform().GetNormalMat();
-        
-        scene.uboData.projection = projection;
-        scene.uboData.view = view;
-        scene.SetData();
+    s_Data.UniformBuffer->SetData(&s_Data.UniformData, sizeof(RenderData::UniformData));
+}
 
-        object.GetMesh().GetShader()->UploadUniformMat4("model", model);
-        object.GetMesh().GetShader()->UploadUniformMat4("normal", normal);
-        object.GetMesh().GetShader()->UploadUniformBuffer("GlobalUbo", scene.ubo);
+void Renderer::End()
+{
+    return;
+}
 
-        glDrawElements(GL_TRIANGLES, (GLsizei)object.GetMesh().GetVertexArray()->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+void Renderer::DrawMesh(const TransformComponent& transform, const MeshComponent& mesh)
+{
+    auto& staticMesh = mesh.StaticMesh;
+    staticMesh.GetShader()->Bind();
+    staticMesh.GetVertexArray()->Bind();
+    staticMesh.GetTexture()->Bind();
 
-        object.GetMesh().GetShader()->UnBind();
-        object.GetMesh().GetVertexArray()->UnBind();
-        object.GetMesh().GetTexture()->UnBind();
-    }
+    staticMesh.GetShader()->UploadUniformMat4("model", transform.GetModelMat());
+    staticMesh.GetShader()->UploadUniformMat4("normal", transform.GetNormalMat());
+
+    const uint32_t vertexCount = (GLsizei)staticMesh.GetVertexArray()->GetIndexBuffer()->GetCount();
+    glDrawElements(GL_TRIANGLES, (GLsizei)vertexCount, GL_UNSIGNED_INT, nullptr);
+    AddVertexCount(vertexCount);
+    IncrementDrawCall();
+    
+    staticMesh.GetShader()->UnBind();
+    staticMesh.GetVertexArray()->UnBind();
+    staticMesh.GetTexture()->UnBind();
+}
+
+void Renderer::ResetStats()
+{
+    memset(&s_Data.RenderStats, 0, sizeof(Stats));
+}
+
+Renderer::Stats Renderer::GetStats()
+{
+    return s_Data.RenderStats;
+}
+
+Renderer::RenderData Renderer::GetRenderData()
+{
+    return s_Data;
+}
+
+Renderer::RenderData::GlobalUbo Renderer::GetUniformData()
+{
+    return s_Data.UniformData;
+}
+
+void Renderer::SetRenderData(const RenderData& data)
+{
+    s_Data = data;
+}
+
+void Renderer::SetUniformData(const RenderData::GlobalUbo& data)
+{
+    s_Data.UniformData = data;
+}
+
+void Renderer::SetDirectionalLightPosition(const glm::vec3& position)
+{
+    s_Data.UniformData.lightPosition = position;
+}
+
+void Renderer::SetDirectionalLightColor(const glm::vec4& color)
+{
+    s_Data.UniformData.lightColor = color;
+}
+
+void Renderer::SetAmbientColor(const glm::vec4& color)
+{
+    s_Data.UniformData.ambientColor = color;
+}
+
+inline void Renderer::IncrementDrawCall()
+{
+    s_Data.RenderStats.DrawCalls++;
+}
+
+inline void Renderer::AddVertexCount(uint32_t count)
+{
+    s_Data.RenderStats.VertexCount += count;
 }

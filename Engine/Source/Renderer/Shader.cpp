@@ -64,16 +64,6 @@ void Shader::UploadUniformFloat(const std::string& name, const float& value) con
     glUniform1f(glGetUniformLocation(m_shader, name.c_str()), value);
 }
 
-void Shader::UploadUniformBuffer(const std::string& name, UniformBuffer& ubo) const
-{
-    glUseProgram(m_shader);
-    uint32_t index = glGetUniformBlockIndex(m_shader, name.c_str());
-    glUniformBlockBinding(m_shader, index, 0);
-    ubo.Bind();
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GlobalUbo), &ubo.GetData());
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-
 std::unordered_map<GLenum, std::vector<char>> Shader::ReadFile(const std::string& path) {
     std::ifstream fileVert(path + ".vert.spv", std::ios::ate | std::ios::binary);
     if (!fileVert.is_open())

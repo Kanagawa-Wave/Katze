@@ -1,20 +1,10 @@
 ﻿#pragma once
 
 #include "Window.h"
-#include "Renderer/Shader.h"
-#include "Renderer/Buffers.h"
-#include "Renderer/VertexArray.h"
-#include "Renderer/Context.h"
-#include "Renderer/Renderer.h"
-#include "Renderer/Texture.h"
 
 #include "Event/Event.h"
 #include "Event/ApplicationEvent.h"
 #include "Layer/LayerStack.h"
-#include "Renderer/Framebuffer.h"
-#include "Scene/Camera.h"
-#include "Scene/GameObject.h"
-#include "Scene/MeshComponent.h"
 #include "UI/ImGuiLayer.h"
 
 /*! @brief Application class maintains the OpenGL context and currently owns a GLFW window.

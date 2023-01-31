@@ -16,9 +16,17 @@ public:
     virtual void OnImGuiRender() override;
 
 private:
+    void DockSpace();
+    void Viewport();
+    void EditorPanels();
+    void StatsOverlay();
+    
     bool OnKeyPressed(KeyPressedEvent& e);
     bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 
     Framebuffer* m_Framebuffer = nullptr;
     Camera* m_EditorCamera = nullptr;
+    Scene* m_Scene = nullptr;
+
+    Timestep m_TS;
 };

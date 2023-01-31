@@ -1,7 +1,8 @@
 ﻿#pragma once
 
 #include "pch.h"
-#include "Core/Core.h"
+
+#include "Core.h"
 
 /*  Events in Katze are currently blocking, meaning when an event occurs it
     immediately gets dispatched and must be dealt with right then an there.

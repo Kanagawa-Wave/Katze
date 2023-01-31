@@ -1,13 +1,11 @@
 ﻿#pragma once
 
-#include "Camera.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Buffers.h"
 #include "Renderer/Texture.h"
 #include "Renderer/VertexArray.h"
-#include "Components.h"
 
-class MeshComponent
+class Mesh
 {
 public:
     struct Vertex
@@ -37,9 +35,9 @@ public:
         }
     };
     
-    MeshComponent() = default;
-    MeshComponent(const std::string& path);
-    MeshComponent(const std::string& meshPath, const std::string& shaderPath, const std::string& texturePath);
+    Mesh() = default;
+    Mesh(const std::string& path);
+    Mesh(const std::string& meshPath, const std::string& shaderPath, const std::string& texturePath);
 
     void LoadMeshFromFile(const std::string& path);
     void SetShader(const std::string& path);

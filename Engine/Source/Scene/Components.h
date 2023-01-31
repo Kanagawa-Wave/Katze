@@ -7,6 +7,8 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "Camera.h"
+#include "Mesh.h"
+
 
 struct TagComponent
 {
@@ -17,6 +19,18 @@ struct TagComponent
 
     TagComponent(const std::string& tag)
         : Tag(tag)
+    {
+    }
+};
+
+struct IDComponent
+{
+    uint32_t ID;
+
+    IDComponent() = default;
+    IDComponent(const IDComponent&) = default;
+
+    IDComponent(uint32_t UUID) : ID(UUID)
     {
     }
 };
@@ -37,7 +51,8 @@ struct TransformComponent
 
     TransformComponent(const glm::vec3& translation, const glm::vec3& rotation, const glm::vec3& scale)
         : Translation(translation), Rotation(rotation), Scale(scale)
-    {}
+    {
+    }
 
     glm::mat4 GetTransform() const
     {
@@ -113,8 +128,6 @@ struct TransformComponent
 struct CameraComponent
 {
     Camera Camera;
-    bool Primary = true; // TODO: think about moving to Scene
-    bool FixedAspectRatio = false;
 
     CameraComponent() = default;
     CameraComponent(const CameraComponent&) = default;
@@ -122,5 +135,28 @@ struct CameraComponent
 
 struct PointLightComponent
 {
-    
+    PointLightComponent() = default;
+    PointLightComponent(const PointLightComponent&) = default;
 };
+
+struct MeshComponent
+{
+    Mesh StaticMesh;
+
+    MeshComponent() = default;
+
+    MeshComponent(const std::string& meshPath, const std::string& texturePath)
+    {
+        StaticMesh = Mesh(meshPath, "Shaders/BlinnPhone", texturePath);
+    }
+
+    MeshComponent(const MeshComponent&) = default;
+};
+
+template <typename... Component>
+struct ComponentGroup
+{
+};
+
+using AllComponents = ComponentGroup<IDComponent, TagComponent, TransformComponent, CameraComponent,
+                                     MeshComponent>;

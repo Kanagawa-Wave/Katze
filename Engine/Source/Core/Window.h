@@ -46,7 +46,7 @@ private:
         EventCallbackFn EventCallback;
     };
 
-    WindowData m_data;
-    GLFWwindow* m_window;
-    Context* m_context;
+    WindowData m_data{};
+    GLFWwindow* m_window = nullptr;
+    Context* m_context = nullptr;
 };

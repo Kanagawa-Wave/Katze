@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Components.h"
-#include "MeshComponent.h"
+#include "Mesh.h"
 
 class GameObject
 {
@@ -34,7 +34,7 @@ public:
 
     inline void AddMesh(const std::string& meshPath, const std::string& shaderPath, const std::string& texturePath)
     {
-        mesh = MeshComponent(meshPath, shaderPath, texturePath);
+        mesh = MeshComponent(meshPath, texturePath);
     }
 
     inline void AddMesh(const MeshComponent& meshComp) { mesh = meshComp; }

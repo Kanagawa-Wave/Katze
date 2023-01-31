@@ -1,14 +1,12 @@
 ﻿#include "pch.h"
 
-#include "MeshComponent.h"
+#include "Mesh.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
-#include "Core/Core.h"
-#include "glad/glad.h"
 #include "Renderer/Renderer.h"
 #include "Timer.h"
 
@@ -22,9 +20,9 @@ void hashCombine(std::size_t& seed, const T& v, const Rest&... rest)
 namespace std
 {
     template <>
-    struct hash<MeshComponent::Vertex>
+    struct hash<Mesh::Vertex>
     {
-        size_t operator()(MeshComponent::Vertex const& vertex) const noexcept
+        size_t operator()(Mesh::Vertex const& vertex) const noexcept
         {
             size_t seed = 0;
             hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
@@ -34,7 +32,7 @@ namespace std
 }
 
 
-MeshComponent::MeshComponent(const std::string& path)
+Mesh::Mesh(const std::string& path)
 {
     LOG_INFO("Loading mesh: {0}", path)
     Timer timer;
@@ -42,7 +40,7 @@ MeshComponent::MeshComponent(const std::string& path)
     LOG_INFO("Mesh load complete: {0}s", timer.Elapsed())
 }
 
-MeshComponent::MeshComponent(const std::string& meshPath, const std::string& shaderPath, const std::string& texturePath)
+Mesh::Mesh(const std::string& meshPath, const std::string& shaderPath, const std::string& texturePath)
 {
     LOG_INFO("Loading mesh: {0}", meshPath)
     Timer timer;
@@ -52,7 +50,7 @@ MeshComponent::MeshComponent(const std::string& meshPath, const std::string& sha
     SetTexture(texturePath);
 }
 
-void MeshComponent::LoadMeshFromFile(const std::string& path)
+void Mesh::LoadMeshFromFile(const std::string& path)
 {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -117,7 +115,7 @@ void MeshComponent::LoadMeshFromFile(const std::string& path)
     }
 }
 
-void MeshComponent::SetShader(const std::string& path)
+void Mesh::SetShader(const std::string& path)
 {
     m_shader = new Shader(path);
     m_shader->Bind();
@@ -138,13 +136,13 @@ void MeshComponent::SetShader(const std::string& path)
     m_shader->UnBind();
 }
 
-void MeshComponent::SetTexture(const std::string& path)
+void Mesh::SetTexture(const std::string& path)
 {
     m_texture = new Texture2D(path);
     m_shader->UploadUniformInt("tex", 0);
 }
 
-void MeshComponent::SetTexture()
+void Mesh::SetTexture()
 {
     m_texture = new Texture2D("Assets/white.png");
     m_shader->UploadUniformInt("tex", 0);

@@ -12,11 +12,27 @@ void Renderer::Init()
     s_Data.UniformData = RenderData::GlobalUbo();
     s_Data.UniformData.lightColor = {1.f, 1.f, 1.f, 1.f};
     s_Data.UniformData.ambientColor = {0.f, 0.f, 0.f, 1.f};
-    
+
+    s_Data.BillboardShader = new Shader("Shaders/Billboard");
+
+    float OFFSETS[] = {
+        -1.0, -1.0,
+        -1.0, 1.0,
+        1.0, -1.0,
+        1.0, -1.0,
+        -1.0, 1.0,
+        1.0, 1.0
+    };
+    s_Data.BillboardVB = new VertexBuffer(OFFSETS, sizeof(OFFSETS));
+    s_Data.BillboardVB->SetLayout({{ShaderDataType::Float2, "offset"}});
+
+    s_Data.BillboardVA = new VertexArray();
+    s_Data.BillboardVA->AddVertexBuffer(s_Data.BillboardVB);
+
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_BACK);
 }
 
 void Renderer::SetClearColor(const glm::vec4& color)
@@ -36,6 +52,8 @@ void Renderer::ResizeViewport(unsigned width, unsigned height)
 
 void Renderer::Begin(const Camera& camera)
 {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     s_Data.UniformData.projection = camera.GetProjection();
     s_Data.UniformData.view = camera.GetView();
 
@@ -44,7 +62,11 @@ void Renderer::Begin(const Camera& camera)
 
 void Renderer::End()
 {
-    return;
+    glDisable(GL_CULL_FACE);
+    s_Data.BillboardShader->Bind();
+    s_Data.BillboardVA->Bind();
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    s_Data.BillboardShader->UnBind();
 }
 
 void Renderer::DrawMesh(const TransformComponent& transform, const MeshComponent& mesh)
@@ -61,7 +83,7 @@ void Renderer::DrawMesh(const TransformComponent& transform, const MeshComponent
     glDrawElements(GL_TRIANGLES, (GLsizei)vertexCount, GL_UNSIGNED_INT, nullptr);
     AddVertexCount(vertexCount);
     IncrementDrawCall();
-    
+
     staticMesh.GetShader()->UnBind();
     staticMesh.GetVertexArray()->UnBind();
     staticMesh.GetTexture()->UnBind();

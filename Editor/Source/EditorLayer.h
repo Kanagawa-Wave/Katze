@@ -6,7 +6,7 @@ class EditorLayer : public Layer
 {
 public:
     EditorLayer();
-    virtual ~EditorLayer() = default;
+    virtual ~EditorLayer() override = default;
 
     virtual void OnAttach() override;
     virtual void OnDetach() override;
@@ -27,6 +27,7 @@ private:
     Framebuffer* m_Framebuffer = nullptr;
     Camera* m_EditorCamera = nullptr;
     Scene* m_Scene = nullptr;
+    Outliner* m_Outliner = nullptr;
 
     Timestep m_TS;
 };

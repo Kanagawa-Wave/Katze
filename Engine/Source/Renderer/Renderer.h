@@ -38,6 +38,10 @@ public:
         Stats RenderStats;
         GlobalUbo UniformData;
         UniformBuffer* UniformBuffer = nullptr;
+
+        Shader* BillboardShader = nullptr;
+        VertexBuffer* BillboardVB = nullptr;
+        VertexArray* BillboardVA = nullptr;
     };
 
     static void ResetStats();

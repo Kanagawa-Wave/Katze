@@ -47,4 +47,5 @@ private:
     Map m_EntityMap;
 
     friend class Entity;
+    friend class Outliner;
 };

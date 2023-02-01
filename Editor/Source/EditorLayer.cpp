@@ -1,5 +1,7 @@
 ﻿#include "EditorLayer.h"
 
+#include "Outliner/Outliner.h"
+
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -13,18 +15,19 @@ void EditorLayer::OnAttach()
     m_Framebuffer = new Framebuffer();
     m_EditorCamera = new Camera(30.f, 0.001f, 1000.f);
     m_Scene = new Scene();
+    m_Outliner = new Outliner(m_Scene);
 
     Entity smoothVase = m_Scene->CreateStaticMesh("smoothVase", "Assets/smooth_vase.obj");
     smoothVase.GetComponent<TransformComponent>().Rotation.z = glm::pi<float>();
     smoothVase.GetComponent<TransformComponent>().Scale = {3.f, 3.f, 3.f};
     smoothVase.GetComponent<TransformComponent>().Translation = {0.5f, -0.5f, 0.f};
     
-    Entity flatVase = m_Scene->CreateStaticMesh("smoothVase", "Assets/flat_vase.obj");
+    Entity flatVase = m_Scene->CreateStaticMesh("flatVase", "Assets/flat_vase.obj");
     flatVase.GetComponent<TransformComponent>().Rotation.z = glm::pi<float>();
     flatVase.GetComponent<TransformComponent>().Scale = {3.f, 3.f, 3.f};
     flatVase.GetComponent<TransformComponent>().Translation = {-0.5f, -0.5f, 0.f};
 
-    Entity floor = m_Scene->CreateStaticMesh("smoothVase", "Assets/floor.obj");
+    Entity floor = m_Scene->CreateStaticMesh("floor", "Assets/floor.obj");
     floor.GetComponent<TransformComponent>().Rotation.z = glm::pi<float>();
     floor.GetComponent<TransformComponent>().Scale = {3.f, 1.f, 3.f};
     floor.GetComponent<TransformComponent>().Translation = {0.f, -0.5f, 0.f};
@@ -60,6 +63,8 @@ void EditorLayer::OnImGuiRender()
     EditorPanels();
     Viewport();
     StatsOverlay();
+    
+    m_Outliner->OnImGuiRender();
 }
 
 void EditorLayer::DockSpace()
@@ -161,7 +166,7 @@ void EditorLayer::EditorPanels()
     glm::vec4 ambientColor = Renderer::GetUniformData().ambientColor;
     
     ImGui::Begin("Config");
-    ImGui::Text("Directional Light");
+    ImGui::Text("Point Light");
     ImGui::SliderFloat3("Light Position", glm::value_ptr(lightPos), -5.f, 5.f);
     ImGui::ColorEdit3("Light Color", glm::value_ptr(lightColor));
     ImGui::SliderFloat("Light Intensity", &lightColor.w, 0.f, 1.f);

@@ -6,20 +6,14 @@
 
 VertexBuffer::VertexBuffer(float* vertices, uint32_t size)
 {
-    // glGenBuffers(1, &m_vbo);
-    // glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    // glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
     glCreateBuffers(1, &m_vbo);
-    glNamedBufferStorage(m_vbo, size, vertices, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferData(m_vbo, size, vertices, GL_STATIC_DRAW);
 }
 
 VertexBuffer::VertexBuffer(void* data, uint32_t size)
 {
-    // glGenBuffers(1, &m_vbo);
-    // glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    // glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     glCreateBuffers(1, &m_vbo);
-    glNamedBufferStorage(m_vbo, size, data, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferData(m_vbo, size, data, GL_STATIC_DRAW);
 }
 
 VertexBuffer::~VertexBuffer()
@@ -37,12 +31,16 @@ void VertexBuffer::UnBind() const
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+uint32_t VertexBuffer::GetID() const
+{
+    return m_vbo;
+}
+
 IndexBuffer::IndexBuffer(uint32_t* indices, uint32_t count)
     : m_count(count)
 {
-    glGenBuffers(1, &m_ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
+    glCreateBuffers(1, &m_ibo);
+    glNamedBufferData(m_ibo, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
 }
 
 IndexBuffer::~IndexBuffer()

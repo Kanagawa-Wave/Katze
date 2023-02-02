@@ -24,44 +24,37 @@ void Shader::UnBind() const {
 /* const std::string& name needs to match exactly with uniform name in shader source code! */
 void Shader::UploadUniformInt(const std::string& name, const int& value) const
 {
-    glUseProgram(m_shader);
-    glUniform1i(glGetUniformLocation(m_shader, name.c_str()), value);
+    glProgramUniform1i(m_shader, glGetUniformLocation(m_shader, name.c_str()), value);
 }
 
 void Shader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const
 {
-    glUseProgram(m_shader);
-    glUniformMatrix4fv(glGetUniformLocation(m_shader, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
+    glProgramUniformMatrix4fv(m_shader, glGetUniformLocation(m_shader, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Shader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const
 {
-    glUseProgram(m_shader);
-    glUniformMatrix3fv(glGetUniformLocation(m_shader, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
+    glProgramUniformMatrix3fv(m_shader, glGetUniformLocation(m_shader, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Shader::UploadUniformFloat4(const std::string& name, const glm::vec4& values) const
 {
-    glUseProgram(m_shader);
-    glUniform4f(glGetUniformLocation(m_shader, name.c_str()), values.x, values.y, values.z, values.w);
+    glProgramUniform4f(m_shader, glGetUniformLocation(m_shader, name.c_str()), values.x, values.y, values.z, values.w);
 }
 
 void Shader::UploadUniformFloat3(const std::string& name, const glm::vec3& values) const
 {
-    glUseProgram(m_shader);
-    glUniform3f(glGetUniformLocation(m_shader, name.c_str()), values.x, values.y, values.z);
+    glProgramUniform3f(m_shader, glGetUniformLocation(m_shader, name.c_str()), values.x, values.y, values.z);
 }
 
 void Shader::UploadUniformFloat2(const std::string& name, const glm::vec2& values) const
 {
-    glUseProgram(m_shader);
-    glUniform2f(glGetUniformLocation(m_shader, name.c_str()), values.x, values.y);
+    glProgramUniform2f(m_shader, glGetUniformLocation(m_shader, name.c_str()), values.x, values.y);
 }
 
 void Shader::UploadUniformFloat(const std::string& name, const float& value) const
 {
-    glUseProgram(m_shader);
-    glUniform1f(glGetUniformLocation(m_shader, name.c_str()), value);
+    glProgramUniform1f(m_shader, glGetUniformLocation(m_shader, name.c_str()), value);
 }
 
 std::unordered_map<GLenum, std::vector<char>> Shader::ReadFile(const std::string& path) {

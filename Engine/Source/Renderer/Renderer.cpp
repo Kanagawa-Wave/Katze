@@ -31,8 +31,6 @@ void Renderer::Init()
 
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
-    // glEnable(GL_CULL_FACE);
-    // glCullFace(GL_BACK);
 }
 
 void Renderer::SetClearColor(const glm::vec4& color)
@@ -63,9 +61,15 @@ void Renderer::Begin(const Camera& camera)
 void Renderer::End()
 {
     glDisable(GL_CULL_FACE);
+    
     s_Data.BillboardShader->Bind();
     s_Data.BillboardVA->Bind();
+    
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    AddVertexCount(6);
+    IncrementDrawCall();
+    
+    s_Data.BillboardVA->UnBind();
     s_Data.BillboardShader->UnBind();
 }
 

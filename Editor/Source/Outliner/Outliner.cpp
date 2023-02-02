@@ -2,6 +2,8 @@
 
 #include <imgui/imgui.h>
 
+#include <glm/gtc/type_ptr.hpp>
+
 Outliner::Outliner(Scene* scene)
 {
     SetContext(scene);
@@ -20,6 +22,11 @@ void Outliner::OnImGuiRender()
         Entity entity(enttHandle, m_Context);
         DrawEntityNode(entity);
     });
+    ImGui::End();
+
+    ImGui::Begin("Details");
+    if (m_SelectedEntity)
+        DrawComponents(m_SelectedEntity);
     ImGui::End();
 }
 
@@ -42,5 +49,35 @@ void Outliner::DrawEntityNode(Entity entity)
         if (openedChild)
             ImGui::TreePop();
         ImGui::TreePop();
+    }
+}
+
+void Outliner::DrawComponents(Entity entity)
+{
+    if (entity.HasComponent<TagComponent>())
+    {
+        auto& tag = entity.GetComponent<TagComponent>().Tag;
+
+        char buffer[256];
+        memset(buffer, 0, sizeof(buffer));
+        strncpy_s(buffer, sizeof(buffer), tag.c_str(), sizeof(buffer));
+        ImGui::Text("Name");
+        if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
+        {
+            tag = std::string(buffer);
+        }
+        ImGui::Separator();
+    }
+
+    if (entity.HasComponent<TransformComponent>())
+    {
+        if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
+        {
+            auto& transform = entity.GetComponent<TransformComponent>();
+            ImGui::DragFloat3("Position", glm::value_ptr(transform.Translation), 0.1f);
+            ImGui::DragFloat3("Rotation", glm::value_ptr(transform.Rotation), 0.1f);
+            ImGui::DragFloat3("Scale", glm::value_ptr(transform.Scale), 0.1f);
+            ImGui::TreePop();
+        }
     }
 }

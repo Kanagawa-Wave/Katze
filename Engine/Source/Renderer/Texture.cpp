@@ -47,18 +47,18 @@ Texture2D::Texture2D(const std::string& path)
         if (!(internalFormat & dataFormat))
             LOG_ERROR("Format not supported!")
 
-        glGenTextures(1, &m_texture);
-        glBindTexture(GL_TEXTURE_2D, m_texture);
+        glCreateTextures(GL_TEXTURE_2D, 1, &m_texture);
         
-        // set the texture wrapping parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        // set texture filtering parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureStorage2D(m_texture, 4, internalFormat, width, height);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, dataFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        glTextureParameteri(m_texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameteri(m_texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        glTextureParameteri(m_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(m_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        
+        glTextureSubImage2D(m_texture, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
+        glGenerateTextureMipmap(m_texture);
 
         stbi_image_free(data);
     }

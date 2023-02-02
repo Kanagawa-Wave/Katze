@@ -17,6 +17,8 @@ public:
 
     const BufferLayout& GetLayout() const { return m_layout; }
     void SetLayout(const BufferLayout& layout) { m_layout = layout; }
+
+    uint32_t GetID() const;
 private:
     uint32_t m_vbo = 0;
     BufferLayout m_layout{};

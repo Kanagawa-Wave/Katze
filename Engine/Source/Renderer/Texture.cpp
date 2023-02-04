@@ -15,13 +15,13 @@ Texture2D::Texture2D(const std::string& path)
     int width, height, channels;
     stbi_set_flip_vertically_on_load(1);
     stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-		
-    if(stbi_failure_reason())
+
+    if (stbi_failure_reason())
     {
         LOG_ERROR("stb_image error: {0}", stbi_failure_reason())
         LOG_ERROR("Error when loading image")
-    }	
-		
+    }
+
     if (data)
     {
         m_isLoaded = true;
@@ -48,7 +48,7 @@ Texture2D::Texture2D(const std::string& path)
             LOG_ERROR("Format not supported!")
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_texture);
-        
+
         glTextureStorage2D(m_texture, 4, internalFormat, width, height);
 
         glTextureParameteri(m_texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -56,7 +56,7 @@ Texture2D::Texture2D(const std::string& path)
 
         glTextureParameteri(m_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTextureParameteri(m_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        
+
         glTextureSubImage2D(m_texture, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
         glGenerateTextureMipmap(m_texture);
 
@@ -68,10 +68,13 @@ Texture2D::Texture2D(uint32_t width, uint32_t height)
     : m_width(width), m_height(height)
 {
     glGenTextures(1, &m_texture);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, (GLsizei)m_width, (GLsizei)m_height, 0, GL_RGBA, GL_FLOAT, nullptr);
 }
 
 Texture2D::~Texture2D()

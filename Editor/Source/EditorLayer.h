@@ -30,4 +30,8 @@ private:
     Outliner* m_Outliner = nullptr;
 
     Timestep m_TS;
+
+    // TODO: Remove
+    Shader* m_testCS = nullptr;
+    Texture2D* m_testOutput = nullptr;
 };

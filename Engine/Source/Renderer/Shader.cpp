@@ -5,19 +5,34 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
-Shader::Shader(const std::string& path) {
-    CreateShader(ReadFile(path));
+Shader::Shader(const std::string& path, ShaderType type)
+    : m_shaderType(type)
+{
+    switch (type)
+    {
+    case ShaderType::VERTEX_AND_FRAGMENT:
+        CreateShader(ReadFile(path));
+        break;
+    case ShaderType::COMPUTE:
+        CreateShader(ReadFile_Generic(path));
+        break;
+    default:
+        LOG_ERROR("Invalid shader type!")
+    }
 }
 
-Shader::~Shader() {
+Shader::~Shader()
+{
     glDeleteProgram(m_shader);
 }
 
-void Shader::Bind() const {
+void Shader::Bind() const
+{
     glUseProgram(m_shader);
 }
 
-void Shader::UnBind() const {
+void Shader::UnBind() const
+{
     glUseProgram(0);
 }
 
@@ -29,12 +44,14 @@ void Shader::UploadUniformInt(const std::string& name, const int& value) const
 
 void Shader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const
 {
-    glProgramUniformMatrix4fv(m_shader, glGetUniformLocation(m_shader, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
+    glProgramUniformMatrix4fv(m_shader, glGetUniformLocation(m_shader, name.c_str()), 1, GL_FALSE,
+                              glm::value_ptr(matrix));
 }
 
 void Shader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const
 {
-    glProgramUniformMatrix3fv(m_shader, glGetUniformLocation(m_shader, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
+    glProgramUniformMatrix3fv(m_shader, glGetUniformLocation(m_shader, name.c_str()), 1, GL_FALSE,
+                              glm::value_ptr(matrix));
 }
 
 void Shader::UploadUniformFloat4(const std::string& name, const glm::vec4& values) const
@@ -57,7 +74,8 @@ void Shader::UploadUniformFloat(const std::string& name, const float& value) con
     glProgramUniform1f(m_shader, glGetUniformLocation(m_shader, name.c_str()), value);
 }
 
-std::unordered_map<GLenum, std::vector<char>> Shader::ReadFile(const std::string& path) {
+std::unordered_map<GLenum, std::vector<char>> Shader::ReadFile(const std::string& path)
+{
     std::ifstream fileVert(path + ".vert.spv", std::ios::ate | std::ios::binary);
     if (!fileVert.is_open())
         throw std::runtime_error("Failed to open file!");
@@ -86,17 +104,36 @@ std::unordered_map<GLenum, std::vector<char>> Shader::ReadFile(const std::string
     return result;
 }
 
-void Shader::CreateShader(const std::unordered_map<GLenum, std::vector<char>>& input) {
+std::vector<char> Shader::ReadFile_Generic(const std::string& path)
+{
+    std::ifstream fileVert(path + ".comp.spv", std::ios::ate | std::ios::binary);
+    if (!fileVert.is_open())
+        throw std::runtime_error("Failed to open file!");
+    long long fileSize = fileVert.tellg();
+    if (fileSize == 0)
+        throw std::runtime_error(path + " doesn't exist!");
+    std::vector<char> buffer(fileSize);
+    fileVert.seekg(0);
+    fileVert.read(buffer.data(), fileSize);
+    fileVert.close();
+
+    return buffer;
+}
+
+
+void Shader::CreateShader(const std::unordered_map<GLenum, std::vector<char>>& input)
+{
     GLuint program = glCreateProgram();
     std::vector<GLenum> glShaderIDs(input.size());
 
     int index = 0;
-    for (auto& kv : input) {
+    for (auto& kv : input)
+    {
         const GLenum& type = kv.first;
         const std::vector<char>& spv = kv.second;
 
         GLuint s_id = glCreateShader(type);
-        glShaderBinary(1, &s_id, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB, spv.data(), (GLsizei) spv.size());
+        glShaderBinary(1, &s_id, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB, spv.data(), (GLsizei)spv.size());
         glSpecializeShader(s_id, "main", 0, nullptr, nullptr);
 
         int compiled = 0;
@@ -137,6 +174,21 @@ void Shader::CreateShader(const std::unordered_map<GLenum, std::vector<char>>& i
 
     for (auto s_id : glShaderIDs)
         glDetachShader(program, s_id);
+}
 
+void Shader::CreateShader(const std::vector<char>& input)
+{
+    uint32_t program = glCreateProgram();
+    uint32_t shader = glCreateShader(GL_COMPUTE_SHADER);
+    glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB, input.data(), (GLsizei)input.size());
+    glSpecializeShader(shader, "main", 0, nullptr, nullptr);
 
+    int compiled = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+    if (compiled)
+        glAttachShader(program, shader);
+
+    m_shader = program;
+    glLinkProgram(program);
+    glDetachShader(program, shader);
 }

@@ -9,6 +9,7 @@ rule "CompileShaders"
     {
         ".frag",
         ".vert",
+        ".comp"
     }
     
     buildmessage "Compiling %(Filename) with GLSL-SPV"
@@ -300,6 +301,7 @@ project "Engine"
     {
         "%{prj.name}/Shaders/**.vert",
         "%{prj.name}/Shaders/**.frag",
+        "%{prj.name}/Shaders/**.comp",
         
         "%{prj.name}/Source/**.h",
         "%{prj.name}/Source/**.hpp",

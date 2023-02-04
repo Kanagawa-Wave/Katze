@@ -7,8 +7,14 @@ typedef unsigned int GLenum;
 
 class Shader {
 public:
+    enum ShaderType
+    {
+        VERTEX_AND_FRAGMENT,
+        COMPUTE,
+    };
+    
     Shader() = default;
-    Shader(const std::string& path);
+    Shader(const std::string& path, ShaderType type = ShaderType::VERTEX_AND_FRAGMENT);
     ~Shader();
 
     void Bind() const;
@@ -24,11 +30,19 @@ public:
     void UploadUniformFloat2(const std::string& name, const glm::vec2& values) const;
     void UploadUniformFloat(const std::string& name, const float& value) const;
 
+    ShaderType GetType() const { return m_shaderType; }
+
 private:
     std::unordered_map<GLenum, std::vector<char>> ReadFile(const std::string& path);
+    std::vector<char> ReadFile_Generic(const std::string& path);
     void CreateShader(const std::unordered_map<GLenum, std::vector<char>>& input);
+    void CreateShader(const std::vector<char>& input);
 
-    uint32_t m_shader;
+    uint32_t m_shader = 0;
+    ShaderType m_shaderType = ShaderType::VERTEX_AND_FRAGMENT;
 };
+
+
+
 
 

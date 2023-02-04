@@ -71,7 +71,7 @@ void Window::Init(const WindowProps& props)
     m_context->Init();
 
     glfwSetWindowUserPointer(m_window, &m_data);
-    SetVSync(true);
+    SetVSync(false);
     SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 
     // Set GLFW callbacks

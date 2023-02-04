@@ -21,7 +21,7 @@ void EditorLayer::OnAttach()
     smoothVase.GetComponent<TransformComponent>().Rotation.z = glm::pi<float>();
     smoothVase.GetComponent<TransformComponent>().Scale = {3.f, 3.f, 3.f};
     smoothVase.GetComponent<TransformComponent>().Translation = {0.5f, -0.5f, 0.f};
-    
+
     Entity flatVase = m_Scene->CreateStaticMesh("flatVase", "Assets/flat_vase.obj");
     flatVase.GetComponent<TransformComponent>().Rotation.z = glm::pi<float>();
     flatVase.GetComponent<TransformComponent>().Scale = {3.f, 3.f, 3.f};
@@ -31,6 +31,9 @@ void EditorLayer::OnAttach()
     floor.GetComponent<TransformComponent>().Rotation.z = glm::pi<float>();
     floor.GetComponent<TransformComponent>().Scale = {3.f, 1.f, 3.f};
     floor.GetComponent<TransformComponent>().Translation = {0.f, -0.5f, 0.f};
+
+    m_testCS = new Shader("Shaders/Compute101", Shader::COMPUTE);
+    m_testOutput = new Texture2D(512, 512);
 }
 
 void EditorLayer::OnDetach()
@@ -51,8 +54,9 @@ void EditorLayer::OnUpdate(Timestep& ts)
     Renderer::Clear();
 
     m_Framebuffer->Bind();
-    
+
     m_Scene->RenderScene(*m_EditorCamera);
+    Compute::DispatchCompute(m_testOutput, m_testCS);
 
     m_Framebuffer->UnBind();
 }
@@ -63,8 +67,13 @@ void EditorLayer::OnImGuiRender()
     EditorPanels();
     Viewport();
     StatsOverlay();
-    
+
     m_Outliner->OnImGuiRender();
+
+    ImGui::Begin("TestOutput");
+    ImGui::Image((ImTextureID)m_testOutput->GetTexture(),
+                 {(float)m_testOutput->GetWidth(), (float)m_testOutput->GetHeight()});
+    ImGui::End();
 }
 
 void EditorLayer::DockSpace()
@@ -164,7 +173,7 @@ void EditorLayer::EditorPanels()
     glm::vec3 lightPos = Renderer::GetUniformData().lightPosition;
     glm::vec4 lightColor = Renderer::GetUniformData().lightColor;
     glm::vec4 ambientColor = Renderer::GetUniformData().ambientColor;
-    
+
     ImGui::Begin("Config");
     ImGui::Text("Point Light");
     ImGui::SliderFloat3("Light Position", glm::value_ptr(lightPos), -5.f, 5.f);

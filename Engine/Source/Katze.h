@@ -6,6 +6,7 @@
 #include "Core/Timestep.h"
 
 #include "Renderer/Renderer.h"
+#include "Renderer/Compute.h"
 #include "Renderer/Framebuffer.h"
 
 #include "Scene/Camera.h"

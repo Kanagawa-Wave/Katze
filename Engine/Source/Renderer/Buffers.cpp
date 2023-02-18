@@ -4,13 +4,13 @@
 
 #include <glad/glad.h>
 
-VertexBuffer::VertexBuffer(float* vertices, uint32_t size)
+VertexBuffer::VertexBuffer(const float* vertices, uint32_t size)
 {
     glCreateBuffers(1, &m_vbo);
     glNamedBufferData(m_vbo, size, vertices, GL_STATIC_DRAW);
 }
 
-VertexBuffer::VertexBuffer(void* data, uint32_t size)
+VertexBuffer::VertexBuffer(const void* data, uint32_t size)
 {
     glCreateBuffers(1, &m_vbo);
     glNamedBufferData(m_vbo, size, data, GL_STATIC_DRAW);
@@ -36,7 +36,7 @@ uint32_t VertexBuffer::GetID() const
     return m_vbo;
 }
 
-IndexBuffer::IndexBuffer(uint32_t* indices, uint32_t count)
+IndexBuffer::IndexBuffer(const uint32_t* indices, uint32_t count)
     : m_count(count)
 {
     glCreateBuffers(1, &m_ibo);

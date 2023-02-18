@@ -85,7 +85,6 @@ void Window::Init(const WindowProps& props)
         data.Height = height;
     });
 
-
     glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window)
     {
         WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));

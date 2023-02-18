@@ -20,6 +20,7 @@ private:
     void Viewport();
     void EditorPanels();
     void StatsOverlay();
+    void DebugViewport();
     
     bool OnKeyPressed(KeyPressedEvent& e);
     bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
@@ -28,6 +29,10 @@ private:
     Camera* m_EditorCamera = nullptr;
     Scene* m_Scene = nullptr;
     Outliner* m_Outliner = nullptr;
+
+    bool m_ShowStats = true;
+    bool m_ViewportRealTime = true;
+    bool m_DebugViewportRealTime = false;
 
     Timestep m_TS;
 

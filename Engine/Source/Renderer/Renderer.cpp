@@ -93,6 +93,19 @@ void Renderer::DrawMesh(const TransformComponent& transform, const MeshComponent
     staticMesh.GetTexture()->UnBind();
 }
 
+void Renderer::DrawSkyBox(const Skybox* skyBox)
+{
+    glDepthMask(GL_FALSE);
+
+    skyBox->Bind();
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    AddVertexCount(36);
+    IncrementDrawCall();
+    skyBox->UnBind();
+    
+    glDepthMask(GL_TRUE);
+}
+
 void Renderer::ResetStats()
 {
     memset(&s_Data.RenderStats, 0, sizeof(Stats));

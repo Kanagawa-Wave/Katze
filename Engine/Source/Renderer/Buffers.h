@@ -8,8 +8,8 @@ class VertexBuffer
 {
 public:
     VertexBuffer() = default;
-    VertexBuffer(float* vertices, uint32_t size);
-    VertexBuffer(void* data, uint32_t size);
+    VertexBuffer(const float* vertices, uint32_t size);
+    VertexBuffer(const void* data, uint32_t size);
     ~VertexBuffer();
     
     void Bind() const;
@@ -28,7 +28,7 @@ class IndexBuffer
 {
 public:
     IndexBuffer() = default;
-    IndexBuffer(uint32_t* indices, uint32_t count);
+    IndexBuffer(const uint32_t* indices, uint32_t count);
     ~IndexBuffer();
     
     void Bind() const;

@@ -138,12 +138,12 @@ void Mesh::SetShader(const std::string& path)
 
 void Mesh::SetTexture(const std::string& path)
 {
-    m_texture = new Texture2D(path);
+    m_texture = new Texture2D(path, ETextureUsage::Texture);
     m_shader->UploadUniformInt("tex", 0);
 }
 
 void Mesh::SetTexture()
 {
-    m_texture = new Texture2D("Assets/white.png");
+    m_texture = new Texture2D("Assets/white.png", ETextureUsage::Texture);
     m_shader->UploadUniformInt("tex", 0);
 }

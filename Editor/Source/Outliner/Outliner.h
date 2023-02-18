@@ -17,4 +17,6 @@ private:
     
     Scene* m_Context = nullptr;
     Entity m_SelectedEntity;
+
+    char CubeMapBuffer[256]{};
 };

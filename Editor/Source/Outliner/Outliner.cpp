@@ -78,6 +78,26 @@ void Outliner::DrawComponents(Entity entity)
             ImGui::DragFloat3("Rotation", glm::value_ptr(transform.Rotation), 0.1f);
             ImGui::DragFloat3("Scale", glm::value_ptr(transform.Scale), 0.1f);
             ImGui::TreePop();
+            ImGui::Separator();
+        }
+    }
+
+    if (entity.HasComponent<SkyBoxComponent>())
+    {
+        if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Skybox"))
+        {
+            const auto& Skybox = entity.GetComponent<SkyBoxComponent>();
+            const std::string currentCubeMap = Skybox.SkyBox->GetPath();
+            
+            ImGui::Text("Current CubeMap: %s", currentCubeMap.c_str());
+            ImGui::InputText("##Tag", CubeMapBuffer, 256);
+            if (ImGui::Button("Set CubeMap"))
+            {
+                Skybox.SkyBox->LoadCubeMap(CubeMapBuffer);
+            }
+            
+            ImGui::TreePop();
+            ImGui::Separator();
         }
     }
 }

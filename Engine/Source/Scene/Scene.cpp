@@ -14,13 +14,11 @@ Scene::~Scene()
 
 Entity Scene::CreateEntity(const std::string& name)
 {
-    static uint32_t currentID = 0;
     return CreateEntityWithUUID(currentID++, name);
 }
 
 Entity Scene::CreateStaticMesh(const std::string& name, const std::string& meshPath, const std::string& texturePath)
 {
-    static uint32_t currentID = 0;
     Entity staticMesh = CreateEntityWithUUID(currentID++, name);
     staticMesh.AddComponent<MeshComponent>(meshPath, texturePath);
     return staticMesh;
@@ -78,6 +76,8 @@ void Scene::RenderScene(const Camera& camera)
     Renderer::SetClearColor({0.0f, 0.0f, 0.0f, 1.0f});
     Renderer::Clear();
 
+    Renderer::DrawSkyBox(m_SkyBox);
+    
     auto view = m_Registry.view<TransformComponent, MeshComponent>();
     for (auto entity : view)
     {
@@ -85,6 +85,24 @@ void Scene::RenderScene(const Camera& camera)
 
         Renderer::DrawMesh(transform, mesh);
     }
+
     
     Renderer::End();
+}
+
+Entity Scene::SetSkyBox(const std::string& path)
+{
+    if (m_SkyBox)
+        CORE_ASSERT(0, "Cannot have 2 skybox in 1 scene!")
+
+    const uint32_t uuid = currentID++;
+    Entity Skybox = Entity(m_Registry.create(), this);
+    Skybox.AddComponent<IDComponent>(uuid);
+    Skybox.AddComponent<TransformComponent>();
+    auto& tag = Skybox.AddComponent<TagComponent>();
+    tag.Tag = "Skybox";
+
+    m_EntityMap[uuid] = Skybox;
+    m_SkyBox = Skybox.AddComponent<SkyBoxComponent>(path).SkyBox;
+    return Skybox;
 }

@@ -4,6 +4,8 @@
 
 #include <entt.hpp>
 
+#include "Skybox.h"
+
 class Entity;
 
 class Scene
@@ -35,8 +37,10 @@ public:
         return m_Registry.view<Components...>();
     }
     void RenderScene(const Camera& camera);
-private:
 
+    Entity SetSkyBox(const std::string& path);
+private:
+    Skybox* m_SkyBox = nullptr;
 private:
     entt::registry m_Registry;
     uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
@@ -45,6 +49,8 @@ private:
     int m_StepFrames = 0;
 
     Map m_EntityMap;
+
+    uint32_t currentID = 0;
 
     friend class Entity;
     friend class Outliner;

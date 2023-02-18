@@ -13,27 +13,29 @@ EditorLayer::EditorLayer()
 void EditorLayer::OnAttach()
 {
     m_Framebuffer = new Framebuffer();
-    m_EditorCamera = new Camera(30.f, 0.001f, 1000.f);
+    m_EditorCamera = new Camera(30.f, 0.001f, 10000.f);
     m_Scene = new Scene();
     m_Outliner = new Outliner(m_Scene);
 
-    Entity smoothVase = m_Scene->CreateStaticMesh("smoothVase", "Assets/smooth_vase.obj");
+    m_Scene->SetSkyBox("Assets/Skybox/Storforsen");
+
+    Entity smoothVase = m_Scene->CreateStaticMesh("SmoothVase", "Assets/smooth_vase.obj");
     smoothVase.GetComponent<TransformComponent>().Rotation.z = glm::pi<float>();
     smoothVase.GetComponent<TransformComponent>().Scale = {3.f, 3.f, 3.f};
     smoothVase.GetComponent<TransformComponent>().Translation = {0.5f, -0.5f, 0.f};
 
-    Entity flatVase = m_Scene->CreateStaticMesh("flatVase", "Assets/flat_vase.obj");
+    Entity flatVase = m_Scene->CreateStaticMesh("FlatVase", "Assets/flat_vase.obj");
     flatVase.GetComponent<TransformComponent>().Rotation.z = glm::pi<float>();
     flatVase.GetComponent<TransformComponent>().Scale = {3.f, 3.f, 3.f};
     flatVase.GetComponent<TransformComponent>().Translation = {-0.5f, -0.5f, 0.f};
 
-    Entity floor = m_Scene->CreateStaticMesh("floor", "Assets/floor.obj");
+    Entity floor = m_Scene->CreateStaticMesh("Floor", "Assets/floor.obj");
     floor.GetComponent<TransformComponent>().Rotation.z = glm::pi<float>();
     floor.GetComponent<TransformComponent>().Scale = {3.f, 1.f, 3.f};
     floor.GetComponent<TransformComponent>().Translation = {0.f, -0.5f, 0.f};
 
     m_testCS = new Shader("Shaders/Compute101", Shader::COMPUTE);
-    m_testOutput = new Texture2D(512, 512);
+    m_testOutput = new Texture2D(512, 512, ETextureUsage::ImageTexture);
 }
 
 void EditorLayer::OnDetach()
@@ -42,6 +44,10 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnEvent(Event& event)
 {
+    EventDispatcher dispatcher(event);
+    dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+    dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+    
     m_EditorCamera->OnEvent(event);
 }
 
@@ -53,27 +59,29 @@ void EditorLayer::OnUpdate(Timestep& ts)
     Renderer::SetClearColor({0.0f, 0.2f, 0.2f, 0.8f});
     Renderer::Clear();
 
-    m_Framebuffer->Bind();
+    if (m_ViewportRealTime)
+    {
+        m_Framebuffer->Bind();
 
-    m_Scene->RenderScene(*m_EditorCamera);
-    Compute::DispatchCompute(m_testOutput, m_testCS);
+        m_Scene->RenderScene(*m_EditorCamera);
 
-    m_Framebuffer->UnBind();
+        m_Framebuffer->UnBind();
+    }
+    if (m_DebugViewportRealTime)
+    {
+        Compute::DispatchCompute(m_testOutput, m_testCS);
+    }
 }
 
 void EditorLayer::OnImGuiRender()
 {
     DockSpace();
     EditorPanels();
+    DebugViewport();
     Viewport();
     StatsOverlay();
 
     m_Outliner->OnImGuiRender();
-
-    ImGui::Begin("TestOutput");
-    ImGui::Image((ImTextureID)m_testOutput->GetTexture(),
-                 {(float)m_testOutput->GetWidth(), (float)m_testOutput->GetHeight()});
-    ImGui::End();
 }
 
 void EditorLayer::DockSpace()
@@ -175,6 +183,10 @@ void EditorLayer::EditorPanels()
     glm::vec4 ambientColor = Renderer::GetUniformData().ambientColor;
 
     ImGui::Begin("Config");
+    ImGui::Text("Render Settings");
+    ImGui::Checkbox("Realtime Rendering for Main Viewport", &m_ViewportRealTime);
+    ImGui::Checkbox("Realtime Rendering for Debug Viewport", &m_DebugViewportRealTime);
+    ImGui::Separator();
     ImGui::Text("Point Light");
     ImGui::SliderFloat3("Light Position", glm::value_ptr(lightPos), -5.f, 5.f);
     ImGui::ColorEdit3("Light Color", glm::value_ptr(lightColor));
@@ -189,57 +201,86 @@ void EditorLayer::EditorPanels()
 
 void EditorLayer::StatsOverlay()
 {
-    static int location = 3;
-    ImGuiIO& io = ImGui::GetIO();
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking |
-        ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
-        ImGuiWindowFlags_NoNav;
-    if (location >= 0)
+    if (m_ShowStats)
     {
-        const float PAD = 10.0f;
-        const ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImVec2 work_pos = viewport->WorkPos; // Use work area to avoid menu-bar/task-bar, if any!
-        ImVec2 work_size = viewport->WorkSize;
-        ImVec2 window_pos, window_pos_pivot;
-        window_pos.x = (location & 1) ? (work_pos.x + work_size.x - PAD) : (work_pos.x + PAD);
-        window_pos.y = (location & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);
-        window_pos_pivot.x = (location & 1) ? 1.0f : 0.0f;
-        window_pos_pivot.y = (location & 2) ? 1.0f : 0.0f;
-        ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
-        ImGui::SetNextWindowViewport(viewport->ID);
-        window_flags |= ImGuiWindowFlags_NoMove;
+        static int location = 3;
+        ImGuiIO& io = ImGui::GetIO();
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking |
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+            ImGuiWindowFlags_NoNav;
+        if (location >= 0)
+        {
+            const float PAD = 10.0f;
+            const ImGuiViewport* viewport = ImGui::GetMainViewport();
+            ImVec2 work_pos = viewport->WorkPos; // Use work area to avoid menu-bar/task-bar, if any!
+            ImVec2 work_size = viewport->WorkSize;
+            ImVec2 window_pos, window_pos_pivot;
+            window_pos.x = (location & 1) ? (work_pos.x + work_size.x - PAD) : (work_pos.x + PAD);
+            window_pos.y = (location & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);
+            window_pos_pivot.x = (location & 1) ? 1.0f : 0.0f;
+            window_pos_pivot.y = (location & 2) ? 1.0f : 0.0f;
+            ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+            ImGui::SetNextWindowViewport(viewport->ID);
+            window_flags |= ImGuiWindowFlags_NoMove;
+        }
+        else if (location == -2)
+        {
+            // Center window
+            ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+            window_flags |= ImGuiWindowFlags_NoMove;
+        }
+        ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+        if (ImGui::Begin("Overlay", nullptr, window_flags))
+        {
+            ImGui::Text("Frame Stats");
+            ImGui::Separator();
+            ImGui::Text("Frametime: %.2f ms", (double)m_TS.GetMilliseconds());
+            ImGui::Text("FPS: %d", (int)(1.0 / (double)m_TS.GetSeconds()));
+            ImGui::Separator();
+            ImGui::Text("Render Stats");
+            ImGui::Separator();
+            ImGui::Text("Draw Calls: %d", Renderer::GetStats().DrawCalls);
+            ImGui::Text("Vertex Count: %d", Renderer::GetStats().VertexCount);
+            ImGui::Separator();
+            if (ImGui::IsMousePosValid())
+                ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
+            else
+                ImGui::Text("Mouse Position: <invalid>");
+        }
+        ImGui::End();
     }
-    else if (location == -2)
-    {
-        // Center window
-        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-        window_flags |= ImGuiWindowFlags_NoMove;
-    }
-    ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
-    if (ImGui::Begin("Overlay", nullptr, window_flags))
-    {
-        ImGui::Text("Frame Stats");
-        ImGui::Separator();
-        ImGui::Text("Frametime: %.1f ms", (double)m_TS.GetMilliseconds());
-        ImGui::Text("FPS: %d", (int)(1.0 / (double)m_TS.GetSeconds()));
-        ImGui::Separator();
-        ImGui::Text("Render Stats");
-        ImGui::Separator();
-        ImGui::Text("Draw Calls: %d", Renderer::GetStats().DrawCalls);
-        ImGui::Text("Vertex Count: %d", Renderer::GetStats().VertexCount);
-        ImGui::Separator();
-        if (ImGui::IsMousePosValid())
-            ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
-        else
-            ImGui::Text("Mouse Position: <invalid>");
-    }
-    ImGui::End();
 
     Renderer::ResetStats();
 }
 
+void EditorLayer::DebugViewport()
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("DebugViewport");
+    {
+        const uint32_t width = (uint32_t)ImGui::GetContentRegionAvail().x;
+        const uint32_t height = (uint32_t)ImGui::GetContentRegionAvail().y;
+
+        ImGui::Image(
+            (ImTextureID)m_testOutput->GetTexture(),
+            ImGui::GetContentRegionAvail(),
+            ImVec2(0, 1),
+            ImVec2(1, 0)
+        );
+
+        if (m_EditorCamera->ViewportNeedsResize(width, height))
+        {
+            m_testOutput = new Texture2D(width, height, ETextureUsage::ImageTexture);
+        }
+    }
+    ImGui::End();
+    ImGui::PopStyleVar();
+}
+
 bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 {
+    if (e.GetKeyCode() == Key::GraveAccent)
+        m_ShowStats = !m_ShowStats;
     return true;
 }
 

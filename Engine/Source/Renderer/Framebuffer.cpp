@@ -10,7 +10,8 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height)
 {
     glCreateFramebuffers(1, &m_framebuffer);
 
-    m_texture = new Texture2D(width, height);
+    m_texture = new Texture2D(width, height, ETextureUsage::FramebufferTexture);
+    m_texture->Bind();
     glNamedFramebufferTexture(m_framebuffer, GL_COLOR_ATTACHMENT0, m_texture->GetTexture(), 0);
 
     glCreateRenderbuffers(1, &m_renderbuffer);

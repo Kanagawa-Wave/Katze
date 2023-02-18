@@ -8,6 +8,7 @@
 
 #include "Camera.h"
 #include "Mesh.h"
+#include "Skybox.h"
 
 
 struct TagComponent
@@ -153,10 +154,22 @@ struct MeshComponent
     MeshComponent(const MeshComponent&) = default;
 };
 
+struct SkyBoxComponent
+{
+    Skybox* SkyBox;
+
+    SkyBoxComponent() = default;
+    SkyBoxComponent(const std::string& path)
+    {
+        SkyBox = new Skybox(path);
+    }
+    SkyBoxComponent(const SkyBoxComponent&) = default;
+};
+
 template <typename... Component>
 struct ComponentGroup
 {
 };
 
 using AllComponents = ComponentGroup<IDComponent, TagComponent, TransformComponent, CameraComponent,
-                                     MeshComponent>;
+                                     MeshComponent, SkyBoxComponent>;

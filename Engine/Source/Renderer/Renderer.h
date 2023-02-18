@@ -17,6 +17,7 @@ public:
     static void End();
 
     static void DrawMesh(const TransformComponent& transform, const MeshComponent& mesh);
+    static void DrawSkyBox(const Skybox* skyBox);
 
     struct Stats
     {
